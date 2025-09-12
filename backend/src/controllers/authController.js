@@ -61,12 +61,12 @@ export const register = async (req, res) => {
     // Try sending welcome email but don’t block registration if it fails
     try {
       await transporter.sendMail({
-        from: '"Event Ticketing" <welcome@example.com>',
+        from: '"EvenTix" <welcome@example.com>',
         to: user.email,
-        subject: "Welcome to Event Ticketing Platform!",
+        subject: "Welcome to EvenTix!",
         html: `
           <h1>👋 Welcome, ${user.name || user.email}!</h1>
-          <p>Thanks for registering at <b>Event Ticketing Platform</b>.</p>
+          <p>Thanks for registering at <b>EvenTix</b>.</p>
         `,
       });
     } catch (mailErr) {

@@ -208,7 +208,7 @@ export const createBooking = async (req, res) => {
 
     try {
       await transporter.sendMail({
-        from: '"Event Ticketing" <tickets@eventify.com>',
+        from: '"EvenTix" <swetankan.official@gmail.com>',
         to: req.user.email,
         subject: `Your Ticket for ${event.title}`,
         text: `Thank you for booking!\n\nYour ticket ID: ${

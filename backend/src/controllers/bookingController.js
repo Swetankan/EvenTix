@@ -2,6 +2,8 @@ import Booking from "../models/Booking.js";
 import Event from "../models/Event.js";
 import User from "../models/User.js";
 import transporter from "../utils/mailer.js";
+import { generateVenueMap } from "../utils/mapgenerator.js"; // NEW IMPORT
+
 import {
   generateTicketId,
   generateTicketQR,
@@ -257,18 +259,30 @@ export const createBooking = async (req, res) => {
     bookingData.ticketId = ticketId;
     bookingData.qrCode = qrCode;
 
+    // inside createBooking (replacing your uploaded snippet)
     const booking = await Booking.create(bookingData);
 
     // Send confirmation email
     const seatsText = hasTicketCategories
-      ? ticketItems
-          .map((item) => `${item.quantity}x ${item.categoryName}`)
-          .join(", ")
+      ? ticketItems.map((item) => `${item.quantity}x ${item.categoryName}`).join(", ")
       : `${noOfSeats} seat${noOfSeats > 1 ? "s" : ""}`;
+
+    // 🔹 Generate venue map if coordinates exist
+    let venueMapUrl = null;
+    if (event.venue?.coordinates?.lat && event.venue?.coordinates?.lng) {
+      try {
+        venueMapUrl = await generateVenueMap(
+          event.venue.coordinates.lat,
+          event.venue.coordinates.lng
+        );
+      } catch (mapError) {
+        console.error("Venue map generation failed:", mapError.message);
+      }
+    }
 
     try {
       await transporter.sendMail({
-        from: '"Event Ticketing" <tickets@eventify.com>',
+        from: '"EvenTix" <tickets@eventix.com>',
         to: req.user.email,
         subject: `Your Ticket for ${event.title}`,
         text: `Thank you for booking!\n\nYour ticket ID: ${booking.ticketId}\nEvent: ${event.title}\nDate: ${event.date}\nVenue: ${event.venue}\n\nPlease present the QR code at the event entrance.`,
@@ -277,62 +291,41 @@ export const createBooking = async (req, res) => {
           <div style="max-width: 500px; margin: auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 24px;">
             <h1 style="color: #2d7ff9; text-align: center;">🎟️ Your Event Ticket</h1>
             <hr style="margin: 16px 0;">
-            <p style="font-size: 1.1em;">Thank you for booking <strong>${
-              event.title
-            }</strong>!</p>
+            <p style="font-size: 1.1em;">Thank you for booking <strong>${event.title}</strong>!</p>
             <div style="background: #f0f4ff; border-radius: 6px; padding: 16px; margin: 16px 0; text-align: center;">
               <p style="font-size: 1.2em; margin: 0 0 16px 0;">
                 <strong>Ticket ID:</strong>
-                <span style="font-size: 1.2em; color: #2d7ff9; letter-spacing: 1px;">${
-                  booking.ticketId
-                }</span>
+                <span style="font-size: 1.2em; color: #2d7ff9; letter-spacing: 1px;">${booking.ticketId}</span>
               </p>
               <div style="margin: 16px 0;">
-                <img src="${
-                  booking.qrCode
-                }" alt="Ticket QR Code" style="max-width: 200px; border: 2px solid #e0e0e0; border-radius: 8px;" />
+                <img src="${booking.qrCode}" alt="Ticket QR Code" style="max-width:200px;border:1px solid #ccc;border-radius:6px;" />
               </div>
               <p style="font-size: 0.9em; color: #666; margin: 8px 0 0 0;">Scan this QR code at the event entrance</p>
             </div>
             <ul style="list-style: none; padding: 0; font-size: 1.1em;">
               <li><strong>Event:</strong> ${event.title}</li>
-              <li><strong>Date:</strong> ${new Date(
-                event.date
-              ).toLocaleString()}</li>
-              <li><strong>Venue:</strong> ${
-                event.venue.name || event.venue
-              }</li>
-              ${
-                event.venue.address
-                  ? `<li><strong>Address:</strong> ${event.venue.address}</li>`
-                  : ""
-              }
-              ${
-                event.city
-                  ? `<li><strong>City:</strong> ${event.city}</li>`
-                  : ""
-              }
+              <li><strong>Date:</strong> ${new Date(event.date).toLocaleString()}</li>
+              <li><strong>Venue:</strong> ${event.venue.name || event.venue}</li>
+              ${event.venue.address ? `<li><strong>Address:</strong> ${event.venue.address}</li>` : ""}
+              ${event.city ? `<li><strong>City:</strong> ${event.city}</li>` : ""}
               <li><strong>Tickets:</strong> ${seatsText}</li>
             </ul>
             
             ${
-              event.venue.coordinates
+              venueMapUrl
                 ? `
             <!-- Venue Map Section -->
             <div style="margin: 20px 0; padding: 16px; background: #f8f9fa; border-radius: 8px; text-align: center;">
               <h3 style="color: #333; margin: 0 0 12px 0;">📍 Venue Location</h3>
-              <img src="https://maps.googleapis.com/maps/api/staticmap?center=${event.venue.coordinates.lat},${event.venue.coordinates.lng}&zoom=15&size=400x200&markers=color:red%7C${event.venue.coordinates.lat},${event.venue.coordinates.lng}&key=${process.env.GOOGLE_MAPS_API_KEY}" 
-                   alt="Venue Map" 
-                   style="max-width: 100%; border-radius: 6px; border: 1px solid #ddd;" />
+              <img src="${venueMapUrl}" alt="Venue Map" style="max-width:100%;border-radius:6px;border:1px solid #ddd;" />
               <div style="margin-top: 10px;">
                 <a href="https://www.google.com/maps/search/?api=1&query=${event.venue.coordinates.lat},${event.venue.coordinates.lng}" 
-                   style="background: #4285f4; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 14px;">
+                  style="background: #4285f4; color: white; padding: 8px 16px; text-decoration: none; border-radius: 4px; font-size: 14px;">
                   🗺️ Open in Google Maps
                 </a>
               </div>
             </div>
-            `
-                : ""
+            ` : ""
             }
             
             <hr style="margin: 16px 0;">
@@ -347,9 +340,130 @@ export const createBooking = async (req, res) => {
 
     res.status(201).json(booking);
   } catch (error) {
+    console.error("Error creating booking:", error.message);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+/*
+import Booking from "../models/Booking.js";
+import Event from "../models/Event.js";
+import User from "../models/User.js";
+import transporter from "../utils/mailer.js";
+import { generateVenueMap } from "../utils/mapgenerator.js";
+import {
+  generateTicketId,
+  generateTicketQR,
+} from "../utils/qrCodeGenerator.js";
+import { processRefund, getRefundStatus } from "../utils/stripeRefund.js";
+import { calculateRefundPolicy } from "../utils/refundPolicy.js";
+
+// Updated createBooking function
+export const createBooking = async (req, res) => {
+  try {
+    const {
+      eventId,
+      noOfSeats,
+      ticketItems,
+      totalAmount,
+      totalQuantity,
+      hasTicketCategories,
+      paymentIntentId,
+    } = req.body;
+    const userId = req.user._id;
+
+    if (!eventId) {
+      return res.status(400).json({ message: "Event ID is required" });
+    }
+
+    const event = await Event.findById(eventId);
+    if (!event) return res.status(404).json({ message: "Event not found" });
+
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (event.cancelled) {
+      return res.status(400).json({ message: "Cannot book a cancelled event" });
+    }
+
+    if (new Date(event.date) < new Date()) {
+      return res.status(400).json({ message: "Cannot book past events" });
+    }
+
+    const existing = await Booking.findOne({
+      eventId,
+      userId,
+      cancelledByUser: { $ne: true },
+      cancelledByEvent: { $ne: true },
+    });
+    if (existing)
+      return res.status(400).json({ message: "You already booked this event" });
+
+    let bookingData = {
+      eventId,
+      userId,
+      paymentIntentId,
+      verified: false,
+    };
+
+    // [Ticket category handling logic omitted for brevity]
+
+    let ticketId;
+    let idExists = true;
+    while (idExists) {
+      ticketId = generateTicketId();
+      idExists = await Booking.exists({ ticketId });
+    }
+
+    const qrCode = await generateTicketQR(ticketId, eventId);
+    bookingData.ticketId = ticketId;
+    bookingData.qrCode = qrCode;
+
+    const booking = await Booking.create(bookingData);
+
+    const seatsText = hasTicketCategories
+      ? ticketItems.map(item => `${item.quantity}x ${item.categoryName}`).join(", ")
+      : `${noOfSeats} seat${noOfSeats > 1 ? "s" : ""}`;
+
+    let venueMapUrl = null;
+    if (event.venue?.coordinates?.lat && event.venue?.coordinates?.lng) {
+      try {
+        venueMapUrl = await generateVenueMap(
+          event.venue.coordinates.lat,
+          event.venue.coordinates.lng
+        );
+      } catch (mapError) {
+        console.error("Venue map generation failed:", mapError.message);
+      }
+    }
+
+    try {
+      await transporter.sendMail({
+        from: '"EvenTix" <tickets@eventix.com>',
+        to: req.user.email,
+        subject: `Your Ticket for ${event.title}`,
+        text: `Thank you for booking! Your ticket ID: ${booking.ticketId}`,
+        html: `
+        <div>
+          <p>Event: ${event.title}</p>
+          <p>Date: ${new Date(event.date).toLocaleString()}</p>
+          <p>Venue: ${event.venue.name}</p>
+          <img src="${booking.qrCode}" alt="Ticket QR Code" />
+          ${venueMapUrl ? `<img src="${venueMapUrl}" alt="Venue Map" />` : ""}
+        </div>
+        `,
+      });
+    } catch (emailError) {
+      console.log("Failed to send ticket email:", emailError.message);
+    }
+
+    res.status(201).json(booking);
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
+*/
+
 
 // @desc Cancel a booking
 // @route DELETE /api/bookings/:id
@@ -469,7 +583,7 @@ export const cancelBooking = async (req, res) => {
       );
 
       await transporter.sendMail({
-        from: '"Event Ticketing" <tickets@eventify.com>',
+        from: '"EvenTix" <tickets@eventix.com>',
         to: req.user.email,
         subject: `Booking Cancelled - ${event.title}`,
         text: `Your booking for ${
