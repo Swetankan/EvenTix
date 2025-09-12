@@ -30,9 +30,9 @@ const createGeneralContact = async (req, res) => {
     // Send confirmation email to user
     try {
       await transporter.sendMail({
-        from: '"Event Ticketing Support" <support@eventify.com>',
+        from: '"EvenTix Support" <support@eventix.com>',
         to: email,
-        subject: 'We received your message - Event Ticketing',
+        subject: 'We received your message - EvenTix',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <h2 style="color: #2d7ff9; text-align: center;">Thank you for contacting us!</h2>
@@ -45,7 +45,7 @@ const createGeneralContact = async (req, res) => {
                 <p><strong>Message:</strong> ${message}</p>
               </div>
               <p>Reference ID: <strong>${contact._id}</strong></p>
-              <p>Best regards,<br>Event Ticketing Support Team</p>
+              <p>Best regards,<br>EvenTix Support Team</p>
             </div>
           </div>
         `
@@ -111,7 +111,7 @@ const createEventContact = async (req, res) => {
     // Send notification to organizer
     try {
       await transporter.sendMail({
-        from: '"Event Ticketing" <noreply@eventify.com>',
+        from: '"EvenTix" <noreply@eventix.com>',
         to: event.organizerId.email,
         subject: `New message about your event: ${event.title}`,
         html: `
@@ -141,7 +141,7 @@ const createEventContact = async (req, res) => {
     // Send confirmation to user
     try {
       await transporter.sendMail({
-        from: '"Event Ticketing" <noreply@eventify.com>',
+        from: '"EvenTix" <noreply@eventix.com>',
         to: email,
         subject: `Message sent to ${event.title} organizer`,
         html: `
