@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import apiClient from "../api/apiClient";
+import ParticlesBackground from "../components/ParticlesBackground";
 
 const Home = () => {
   const [featuredEvents, setFeaturedEvents] = useState([]);
@@ -11,18 +12,15 @@ const Home = () => {
     setLoading(true);
     try {
       const res = await apiClient.get("/events");
-      // Get the latest 6 events as featured events
       const events = res.data.filter(
         (event) => !event.cancelled && new Date(event.date) > new Date()
       );
       setFeaturedEvents(events.slice(0, 6));
 
-      // Try to get user's city from the first event or set a default
       if (events.length > 0 && events[0].city) {
         setUserCity(events[0].city);
       } else {
         setUserCity("Bokaro, Jharkhand – 827013");
-
       }
     } catch (err) {
       console.error(err);
@@ -37,37 +35,33 @@ const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-teal-600 text-white overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 bg-black/10"></div>
+      
+      <section className="relative bg-black text-white overflow-hidden min-h-screen flex items-center">
+        {/* Particles Background - only inside hero */}
+        <div className="absolute inset-0 z-0 h-full w-full">
+          <ParticlesBackground />
+        </div>
 
-        {/* Animated Background Elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-white/5 rounded-full blur-xl animate-pulse"></div>
-        <div className="absolute bottom-32 right-20 w-24 h-24 bg-teal-300/10 rounded-full blur-lg animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/3 w-16 h-16 bg-cyan-300/10 rounded-full blur-md animate-pulse delay-500"></div>
-
-        <div className="relative max-w-7xl mx-auto px-6 py-20 sm:py-32">
+        <div className="relative max-w-7xl mx-auto px-6 py-20 sm:py-32 z-10">
           <div className="text-center">
             {/* Main Heading */}
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 tracking-tight">
               Welcome to{" "}
-              <span className="block text-transparent bg-gradient-to-r from-teal-300 via-cyan-300 to-blue-300 bg-clip-text">
+              <span className="block text-transparent bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text">
                 EvenTix
               </span>
             </h1>
 
             {/* Subtitle */}
-            <p className="text-xl sm:text-2xl text-blue-100 mb-8 max-w-3xl mx-auto leading-relaxed">
-              Discover amazing events, book tickets instantly, and create
-              unforgettable experiences. Your gateway to the best concerts,
-              festivals, conferences, and more.
+            <p className="text-xl sm:text-2xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
+              Find incredible events, secure your tickets effortlessly, and enjoy experiences you’ll never forget. Your one-stop destination for concerts, festivals, conferences, and much more.
             </p>
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center mb-12">
               <Link
                 to="/events"
-                className="group inline-flex items-center gap-3 bg-white text-blue-700 px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                className="group inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-teal-500 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300"
               >
                 <svg
                   className="w-6 h-6 transition-transform group-hover:translate-x-1"
@@ -105,33 +99,11 @@ const Home = () => {
                 Create Event
               </Link>
             </div>
-
-            {/* Stats */}
-            {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                  1000+
-                </div>
-                <div className="text-blue-200 font-medium">Events Hosted</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                  50K+
-                </div>
-                <div className="text-blue-200 font-medium">Happy Attendees</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                  200+
-                </div>
-                <div className="text-blue-200 font-medium">
-                  Event Organizers
-                </div>
-              </div>
-            </div> */}
           </div>
         </div>
       </section>
+
+
 
       {/* Featured Events Section */}
       <section className="py-20 bg-gradient-to-b from-slate-50 to-white">
@@ -146,8 +118,8 @@ const Home = () => {
             </p>
           </div>
 
+          {/* Featured Events Grid */}
           {loading ? (
-            /* Loading State */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(6)].map((_, i) => (
                 <div
@@ -165,7 +137,6 @@ const Home = () => {
               ))}
             </div>
           ) : featuredEvents.length === 0 ? (
-            /* Empty State */
             <div className="text-center py-16">
               <div className="w-24 h-24 mx-auto mb-6 bg-slate-100 rounded-full flex items-center justify-center">
                 <svg
@@ -209,14 +180,12 @@ const Home = () => {
               </Link>
             </div>
           ) : (
-            /* Featured Events Grid */
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {featuredEvents.map((event) => (
                 <div
                   key={event._id}
                   className="group bg-white rounded-2xl shadow-lg hover:shadow-2xl border border-slate-100 overflow-hidden transition-all duration-300 hover:-translate-y-2"
                 >
-                  {/* Event Image */}
                   <div className="relative h-48 overflow-hidden">
                     {event.photo ? (
                       <img
@@ -242,14 +211,12 @@ const Home = () => {
                       </div>
                     )}
 
-                    {/* Featured Badge */}
                     <div className="absolute top-4 left-4">
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r from-yellow-400 to-orange-500 text-white shadow-lg">
                         ⭐ Featured
                       </span>
                     </div>
 
-                    {/* Price Badge */}
                     <div className="absolute top-4 right-4">
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-gradient-to-r from-teal-500 to-blue-600 text-white shadow-lg">
                         {event.hasTicketCategories && event.ticketCategories
@@ -261,14 +228,11 @@ const Home = () => {
                     </div>
                   </div>
 
-                  {/* Event Content */}
                   <div className="p-6">
-                    {/* Event Title */}
                     <h3 className="text-xl font-bold text-slate-800 mb-2 line-clamp-2 group-hover:text-blue-700 transition-colors">
                       {event.title}
                     </h3>
 
-                    {/* Event Date */}
                     <div className="flex items-center gap-2 text-slate-600 mb-3">
                       <svg
                         className="w-4 h-4 text-blue-500"
@@ -295,14 +259,11 @@ const Home = () => {
                       </span>
                     </div>
 
-                    {/* Event Description */}
                     <p className="text-slate-600 text-sm line-clamp-2 mb-4">
                       {event.description}
                     </p>
 
-                    {/* Event Details */}
                     <div className="space-y-2 mb-6">
-                      {/* Venue */}
                       <div className="flex items-center gap-2 text-sm">
                         <svg
                           className="w-4 h-4 text-slate-400"
@@ -332,7 +293,6 @@ const Home = () => {
                       </div>
                     </div>
 
-                    {/* Action Button */}
                     <Link
                       to={`/events/${event._id}`}
                       className="block w-full bg-gradient-to-r from-blue-600 to-teal-500 text-white py-3 px-4 rounded-xl font-semibold text-center shadow-lg hover:shadow-xl hover:from-blue-700 hover:to-teal-600 transition-all duration-300 group-hover:scale-105"
@@ -345,7 +305,6 @@ const Home = () => {
             </div>
           )}
 
-          {/* View All Events Link */}
           {featuredEvents.length > 0 && (
             <div className="text-center mt-12">
               <Link
@@ -373,6 +332,6 @@ const Home = () => {
       </section>
     </div>
   );
-};  
+};
 
 export default Home;
