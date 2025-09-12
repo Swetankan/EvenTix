@@ -22,12 +22,13 @@ export default function Navbar() {
     ${
       isActiveLink(path)
         ? "text-blue-600 bg-blue-50"
-        : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+        : "text-white hover:text-blue-600 hover:bg-slate-50"
     }
   `;
 
   return (
-    <nav className="backdrop-blur-md bg-white/40 border-b border-slate-200/50 shadow-lg sticky top-0 z-50">
+    <nav className="bg-black/40 backdrop-blur-sm fixed w-full z-50">
+
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Left Navigation */}
@@ -125,17 +126,17 @@ export default function Navbar() {
             >
               <div className="w-6 h-6 relative flex items-center justify-center">
                 <span
-                  className={`absolute h-0.5 w-6 bg-slate-700 rounded transition-all duration-300 ${
+                  className={`absolute h-0.5 w-6 bg-white rounded transition-all duration-300 ${
                     menuOpen ? "rotate-45" : "-translate-y-2"
                   }`}
                 ></span>
                 <span
-                  className={`absolute h-0.5 w-6 bg-slate-700 rounded transition-all duration-300 ${
+                  className={`absolute h-0.5 w-6 bg-white rounded transition-all duration-300 ${
                     menuOpen ? "opacity-0" : ""
                   }`}
                 ></span>
                 <span
-                  className={`absolute h-0.5 w-6 bg-slate-700 rounded transition-all duration-300 ${
+                  className={`absolute h-0.5 w-6 bg-white rounded transition-all duration-300 ${
                     menuOpen ? "-rotate-45" : "translate-y-2"
                   }`}
                 ></span>
@@ -158,7 +159,7 @@ export default function Navbar() {
                       {currentUser.name?.charAt(0)?.toUpperCase() || "U"}
                     </span>
                   </div>
-                  <span className="font-medium text-slate-700 group-hover:text-blue-600 transition-colors">
+                  <span className="font-medium text-white group-hover:text-blue-600 transition-colors">
                     {currentUser.name}
                   </span>
                 </Link>
@@ -191,7 +192,7 @@ export default function Navbar() {
               <div className="flex items-center gap-3">
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-slate-700 font-medium rounded-xl hover:text-blue-600 hover:bg-slate-50 transition-all duration-300"
+                  className="px-4 py-2 text-white font-medium rounded-xl hover:text-blue-600 hover:bg-slate-50 transition-all duration-300"
                   onClick={handleCloseMenu}
                 >
                   Login
@@ -219,7 +220,7 @@ export default function Navbar() {
               className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
                 isActiveLink("/")
                   ? "text-blue-600 bg-blue-50"
-                  : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                  : "text-white hover:text-blue-600 hover:bg-slate-50"
               }`}
               onClick={handleCloseMenu}
             >
@@ -246,7 +247,7 @@ export default function Navbar() {
               className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
                 isActiveLink("/events")
                   ? "text-blue-600 bg-blue-50"
-                  : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                  : "text-white hover:text-blue-600 hover:bg-slate-50"
               }`}
               onClick={handleCloseMenu}
             >
@@ -273,7 +274,7 @@ export default function Navbar() {
               className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
                 isActiveLink("/contact")
                   ? "text-blue-600 bg-blue-50"
-                  : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                  : "text-white hover:text-blue-600 hover:bg-slate-50"
               }`}
               onClick={handleCloseMenu}
             >
@@ -301,7 +302,7 @@ export default function Navbar() {
                 className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
                   isActiveLink("/dashboard")
                     ? "text-blue-600 bg-blue-50"
-                    : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                    : "text-white hover:text-blue-600 hover:bg-slate-50"
                 }`}
                 onClick={handleCloseMenu}
               >
@@ -332,7 +333,7 @@ export default function Navbar() {
                 className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
                   isActiveLink("/organizer")
                     ? "text-blue-600 bg-blue-50"
-                    : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                    : "text-white hover:text-blue-600 hover:bg-slate-50"
                 }`}
                 onClick={handleCloseMenu}
               >
@@ -361,7 +362,7 @@ export default function Navbar() {
                 className={`block px-4 py-3 rounded-xl font-medium transition-all duration-300 ${
                   isActiveLink("/admin")
                     ? "text-blue-600 bg-blue-50"
-                    : "text-slate-700 hover:text-blue-600 hover:bg-slate-50"
+                    : "text-white hover:text-blue-600 hover:bg-slate-50"
                 }`}
                 onClick={handleCloseMenu}
               >
@@ -435,7 +436,7 @@ export default function Navbar() {
                 <div className="space-y-3">
                   <Link
                     to="/login"
-                    className="block px-4 py-3 text-center text-slate-700 font-medium rounded-xl hover:text-blue-600 hover:bg-slate-50 transition-all duration-300"
+                    className="block px-4 py-3 text-center text-white font-medium rounded-xl hover:text-blue-600 hover:bg-slate-50 transition-all duration-300"
                     onClick={handleCloseMenu}
                   >
                     Login
