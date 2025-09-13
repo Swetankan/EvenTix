@@ -1,1 +1,1 @@
-export const DB_NAME = "event-ticketing-platform";
+export const DB_NAME = "EvenTix";
