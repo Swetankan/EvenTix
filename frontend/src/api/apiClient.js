@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const apiClient = axios.create({
-  baseURL: "http://localhost:8000/api",   // ✅ Direct backend API URL
+  baseURL: "https://even-tix.vercel.app/api",   // ✅ Direct backend API URL
   headers: {
     "Content-Type": "application/json",
   },
