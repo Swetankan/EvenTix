@@ -3,7 +3,12 @@ import Redis from "ioredis";
 
 dotenv.config();
 
-const redisUrl = process.env.REDIS_URL || "redis://default:GGZGeYBpQXqNlWTXVKFZzPyxSDYtBDSP@redis.railway.internal:6379";
+const redisUrl = process.env.REDIS_URL;
+
+if (!redisUrl) {
+console.error("❌ Missing REDIS_URL environment variable");
+process.exit(1);
+}
 
 const client = new Redis(redisUrl);
 
